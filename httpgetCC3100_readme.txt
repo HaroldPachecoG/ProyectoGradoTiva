@@ -1,0 +1,86 @@
+Example Summary
+----------------
+This application demonstrates how to use HTTP Client using the CC3100 device.
+
+Peripherals Exercised
+---------------------
+Board_LED0        Indicator LED
+Board_LED1        AP Connection Indicator LED
+Board_WIFI        Wireless driver instance
+Board_SPI_CC3100  Interface to communicate with CC3100
+Board_BUTTON0     Used to put CC3100 in Smart Config mode
+
+Resources & Jumper Settings
+---------------------------
+Please refer to the development board's specific "Settings and Resources"
+section in the Getting Started Guide. For convenience, a short summary is also
+shown below.
+
+| Development board | Notes                                                  |
+| ================= | ====================================================== |
+| EK-TM4C1294XL     | This example was designed to use a CC3100 evaluation   |
+| EK-TM4C129EXL     | module (CC3100BP). The booster pack is required to     |
+|                   | successfully complete this example. A wireless router  |
+|                   | or access point (AP) is also required for this example.|
+|                   | Note that the CC3100 uses the 2.4GHz band. If your AP  |
+|                   | is dual band (i.e. supports both 2.4GHz and 5GHz bands)|
+|                   | you must utilize the 2.4GHz band when running this     |
+|                   | application.                                           |
+|                   | This example uses the CC3100's SmartConfig technology  |
+|                   | to connect to a wireless network. A SmartConfig        |
+|                   | application will be required to complete the connection|
+|                   | process.  For mobile devices, the application is called|
+|                   | "Texas Instruments SimpleLink Wi-Fi Starter." Again,   |
+|                   | the CC3100 uses the 2.4GHz band, so make sure the      |
+|                   | device that's running the SmartConfig app is connected |
+|                   | to the AP on the 2.4GHz band.                          |
+|                   |                                                        |
+|                   | Lastly, ensure that you have powered the CC3100 itself,|
+|                   | (in addition to powering the base board) via its USB   |
+|                   | port.                                                  |
+| ----------------- | ------------------------------------------------------ |
+
+Example Usage
+-------------
+Run the example. Board_LED0 turns ON to indicate TI-RTOS driver
+initialization is complete.  Board_LED1 is used as a connection indicator during
+the example.
+
+If connecting the CC3100 to the AP for the first time, Board_BUTTON0 must be
+pressed to start the SmartConfig process.  Use another wireless device
+(computer, phone, etc.) connected to the AP to launch a SmartConfig application.
+
+Follow the application instructions to connect the CC3100 to your AP.  Once
+connected, the CC3100's IP address is printed on the console and Board_LED1 is
+ON. The following message should be displayed:
+
+        CC3100 has connected to an AP and acquired an IP address.
+        IP Address: xxx.xxx.xxx.xxx
+
+The example then makes an HTTP GET call to "www.example.com" and prints
+the HTTP response status and the number of bytes of data received.
+
+Application Design Details
+--------------------------
+This application uses a task for HTTP communication:
+
+httpTask:
+      Opens a WIFI driver object.
+
+      Waits until the CC3100 is connected to the AP.  If connecting to AP
+      for the first time, the SmartConfig procedure must be used.  The
+      smartConfigFxn() initializes the configuration process on the CC3100.
+
+      The SimpleLinkWlanEventHandler and SimpleLinkNetAppEventHandler functions
+      manage the connection events.  Execution continues once connected to
+      the AP and DHCP has returned an IP address.
+
+      A connection to the HTTP server is established and then an HTTP GET
+      request using the request URI is sent. The response status code, header
+      fields and body from the HTTP server are processed to get the response
+      status code and data. The connection is closed and resources are freed
+      before the task exits.
+
+For GNU and IAR users, please read the following website for details about
+semi-hosting:
+http://processors.wiki.ti.com/index.php/TI-RTOS_Examples_SemiHosting.
